@@ -25,7 +25,7 @@ var urlDatabase = {
 
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  var templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
@@ -35,29 +35,33 @@ app.get("/urls/new", (req, res) => {
 
 // new that add another page for displaying a single URL and its shortened form.
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, fullURL: urlDatabase[req.params.id] };
+  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
 });
 
+app.get("/", (req, res) => {
+  res.end("Hello!");
+});
 
-
-// app.get("/", (req, res) => {
-//   res.end("Hello!");
-// });
-
-
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
 
 app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  var shortURL = generateRandomString();
+  var longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect("urls/" + shortURL);
+});
+
+
+app.get("/u/:shortURL", (req, res) => {
+  var longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
 app.listen(PORT, () => {
