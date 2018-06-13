@@ -1,12 +1,20 @@
-var express = require("express");
-var app = express();
-var PORT = 8080; // default port 8080
+const express = require("express");
+
+//  initialize express
+const app = express();
+
+// tells the Express app to use EJS as its templating engine(views)
+app.set("view engine", "ejs");
+
 // The body-parser library will allow us to access POST request parameters
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-// tells the Express app to use EJS as its templating engine
-app.set("view engine", "ejs");
+// start the server
+const PORT = 8080; // default port 8080
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
 
 // simulate generating a "unique" shortURL, produces a string of 6 random alphanumeric characters:
 function generateRandomString() {
@@ -23,7 +31,14 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// defining (registering) a HTTP GET request on "/""
+// along with a callback func that will handle the request
+app.get("/", (req, res) => {
+  res.end("Hello!");
+});
+
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
+//
 app.get("/urls", (req, res) => {
   var templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -39,9 +54,6 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.get("/", (req, res) => {
-  res.end("Hello!");
-});
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
@@ -51,11 +63,38 @@ app.get("/hello", (req, res) => {
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
+// fix it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+function validateData(data) {
+  if (data.longURL && data.longURL.length > 0) {
+    return true;
+  }
+  return false;
+}
+
 app.post("/urls", (req, res) => {
-  var shortURL = generateRandomString();
-  var longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-  res.redirect("urls/" + shortURL);
+  var valid = validateData(req.body);
+
+  if (valid) {
+    // const urlDatabase = {
+    //   : req.body.longURL
+    // }
+    var shortURL = generateRandomString();
+    var longURL = req.body.longURL;
+    urlDatabase[shortURL] = longURL;
+    res.redirect("urls/" + shortURL);
+  } else {
+    // error
+    res.render("urls_new", {
+      error: "Please, enter a valid URL."
+    });
+  }
+});
+
+//  POST route that removes a URL resource
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect("/urls");
 });
 
 
@@ -64,6 +103,3 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
