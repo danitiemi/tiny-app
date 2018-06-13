@@ -5,16 +5,15 @@
 </head>
 <body>
   <!-- Add your EJS code here -->
-  <h1> ShortURL <%= shortURL %> </h1> <%= longURL %>
-  <form action="/urls" method="POST" style="margin:150px;">
+  <form action="/urls/:id" method="POST" style="margin:150px">
     <% if (locals.error) { %>
       <p class="alert alert-danger">
         <%= error %>
       </p>
     <% } %>
-    <label for="longURL">Enter a URL:</label>
-    <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-    <input type="update" value="Update">
+    <label for="longURL"><h1> ShortURL <%= shortURL %> </h1></label>
+    <input id="longURL" type="text" name="longURL" placeholder= " <%= longURL %> " style="width: 300px">
+    <button type= "submit" value="Update">Update</button>
   </form>
 
 </body>
