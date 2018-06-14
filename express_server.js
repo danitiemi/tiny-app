@@ -103,6 +103,12 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+// add an endpoint to handle a POST to /login
+app.post("/login", (req, res) => {
+  res.cookie('some_cross_domain_cookie', 'http://mysubdomain.example.com',{domain:'example.com'});
+  res.redirect("/urls");
+});
+
 app.get("/u/:shortURL", (req, res) => {
   var longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);

@@ -1,3 +1,14 @@
 
 <meta charset="UTF-8">
 <title>Tiny App</title>
+
+
+  <form action="/login" method="POST" style="margin:150px;">
+    <% if (locals.error) { %>
+      <p class="alert alert-danger">
+        <%= error %>
+      </p>
+    <% } %>
+    <input id="name" type="text" name="username" placeholder="username" style="width: 300px">
+    <input type="submit" value="Submit">
+  </form>
