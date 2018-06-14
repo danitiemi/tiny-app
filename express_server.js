@@ -40,6 +40,7 @@ app.get("/", (req, res) => {
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 //
 app.get("/urls", (req, res) => {
+  console.log("gettind urls ", urlDatabase);
   var templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
@@ -74,7 +75,7 @@ function validateData(data) {
 
 app.post("/urls", (req, res) => {
   var valid = validateData(req.body);
-
+console.log('ís valid',valid)
   if (valid) {
     // const urlDatabase = {
     //   : req.body.longURL
@@ -104,10 +105,10 @@ app.post("/urls/:id", (req, res) => {
 });
 
 // add an endpoint to handle a POST to /login
-app.post("/login", (req, res) => {
-  res.cookie('some_cross_domain_cookie', 'http://mysubdomain.example.com',{domain:'example.com'});
-  res.redirect("/urls");
-});
+// app.post("/login", (req, res) => {
+//   res.cookie('some_cross_domain_cookie', 'http://mysubdomain.example.com',{domain:'example.com'});
+//   res.redirect("/urls");
+// });
 
 app.get("/u/:shortURL", (req, res) => {
   var longURL = urlDatabase[req.params.shortURL];
