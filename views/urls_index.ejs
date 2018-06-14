@@ -9,11 +9,12 @@
         <li>
     <%= url %>
     <%= urls[url] %>
+
         <form method="POST" action="/urls/<%= url %>/delete">
             <input type=submit value=delete>
         </form>
 
-        <form method="POST" action=''>
+        <form method="GET" action="/urls/<%= url %>">
             <input type=submit value=edit>
         </form>
         </li>

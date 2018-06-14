@@ -99,7 +99,9 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // modify the corresponding longURL and redirect the client back to "/urls"
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL;
+  let id = req.params.id;
+  let longURL = req.body.longURL;
+  urlDatabase[id] = longURL;
   res.redirect("/urls");
 });
 
