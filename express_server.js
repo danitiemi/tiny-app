@@ -10,6 +10,10 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+// cookieParser
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 // start the server
 const PORT = 8080; // default port 8080
 app.listen(PORT, () => {
@@ -33,35 +37,36 @@ var urlDatabase = {
 
 // defining (registering) a HTTP GET request on "/""
 // along with a callback func that will handle the request
-app.get("/", (req, res) => {
-  res.end("Hello!");
-});
+// app.get("/", (req, res) => {
+//   res.end("Hello!");
+// });
 
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 //
 app.get("/urls", (req, res) => {
-  var templateVars = { urls: urlDatabase };
+  var templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  var templateVars = {username: req.cookies["username"]};
+
+  res.render("urls_new", templateVars);
 });
 
 // new that add another page for displaying a single URL and its shortened form.
 app.get("/urls/:id", (req, res) => {
-  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
+  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
-
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.end("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 // fix it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -74,7 +79,7 @@ function validateData(data) {
 
 app.post("/urls", (req, res) => {
   var valid = validateData(req.body);
-
+  console.log('is valid',valid);
   if (valid) {
     // const urlDatabase = {
     //   : req.body.longURL
@@ -83,7 +88,8 @@ app.post("/urls", (req, res) => {
     var longURL = req.body.longURL;
     urlDatabase[shortURL] = longURL;
     res.redirect("urls/" + shortURL);
-  } else {
+  }
+  else {
     // error
     res.render("urls_new", {
       error: "Please, enter a valid URL."
@@ -105,7 +111,23 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-app.get("/u/:shortURL", (req, res) => {
+// add an endpoint to handle a POST to /login
+// set cookie "username"
+app.post("/urls/:id/login", (req, res) => {
+  let username = req.body.username;
+  res.cookie("username", username);
+  res.redirect("/urls");
+});
+
+// /logout endpoint so that it clears the username cookie and redirects the user back to the /urls page
+app.post("/logout", (req, res) => {
+  let username = req.body.username;
+  console.log("HEREEEEE!!!", username);
+  res.clearCookie("username", username);
+  res.redirect("/urls");
+});
+
+app.get("/:shortURL", (req, res) => {
   var longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });

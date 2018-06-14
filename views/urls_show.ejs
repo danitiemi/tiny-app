@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+<meta charset="UTF-8">
 <html lang="en">
 <head>
   <% include partials/_header.ejs %>
 </head>
 <body>
   <!-- Add your EJS code here -->
-  <form action="/urls/:id" method="POST" style="margin:150px">
+  <form action="/urls/<%= shortURL %>" method="POST" style="margin:150px">
     <% if (locals.error) { %>
       <p class="alert alert-danger">
         <%= error %>
