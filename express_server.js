@@ -30,9 +30,23 @@ function generateRandomString() {
   return randomString;
 }
 
-var urlDatabase = {
+let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+
+// used to store and access the users in the app.
+const users = {
+  "userRandomID": {
+    id: "dog",
+    email: "dog@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "cat",
+    email: "cat@example.com",
+    password: "dishwasher-funk"
+  }
 };
 
 // defining (registering) a HTTP GET request on "/""
@@ -50,7 +64,6 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   var templateVars = {username: req.cookies["username"]};
-
   res.render("urls_new", templateVars);
 });
 
@@ -113,7 +126,7 @@ app.post("/urls/:id", (req, res) => {
 
 // add an endpoint to handle a POST to /login
 // set cookie "username"
-app.post("/urls/:id/login", (req, res) => {
+app.post("/login", (req, res) => {
   let username = req.body.username;
   res.cookie("username", username);
   res.redirect("/urls");
@@ -122,8 +135,20 @@ app.post("/urls/:id/login", (req, res) => {
 // /logout endpoint so that it clears the username cookie and redirects the user back to the /urls page
 app.post("/logout", (req, res) => {
   let username = req.body.username;
-  console.log("HEREEEEE!!!", username);
   res.clearCookie("username", username);
+  res.redirect("/urls");
+});
+
+// returns a page that includes a form with an email and password field.
+app.get("/register", (req, res) => {
+  // console.log("HEREEEEE!!!", username);
+  res.render("registration");
+});
+
+// getting info from user registration
+app.post("/register", (req, res) => {
+  const userEmail = req.body.email;
+  const password = req.body.password;
   res.redirect("/urls");
 });
 
