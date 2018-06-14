@@ -145,13 +145,18 @@ app.get("/register", (req, res) => {
 });
 
 // getting info from user registration/ Registration Handler
+// If the e-mail or password are empty strings, send back a response with the 400 status code
 app.post("/register", (req, res) => {
-  const userID = generateRandomString();
+  const userId = generateRandomString();
   const userEmail = req.body.email;
   const password = req.body.password;
-  res.cookie("userID", userID);
-  console.log("HEREEEEE!!!", userID);
-  res.redirect("/urls");
+  if (userEmail.length === 0 || password.length === 0) {
+    res.status(400).send('Bad Request');
+  } else {
+    res.cookie("user_id", userId);
+    // console.log("HEREEEEE!!!", userID);
+    res.redirect("/urls");
+  }
 });
 
 app.get("/:shortURL", (req, res) => {
