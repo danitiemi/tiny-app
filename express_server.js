@@ -141,14 +141,16 @@ app.post("/logout", (req, res) => {
 
 // returns a page that includes a form with an email and password field.
 app.get("/register", (req, res) => {
-  // console.log("HEREEEEE!!!", username);
   res.render("registration");
 });
 
-// getting info from user registration
+// getting info from user registration/ Registration Handler
 app.post("/register", (req, res) => {
+  const userID = generateRandomString();
   const userEmail = req.body.email;
   const password = req.body.password;
+  res.cookie("userID", userID);
+  console.log("HEREEEEE!!!", userID);
   res.redirect("/urls");
 });
 
