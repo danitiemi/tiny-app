@@ -58,18 +58,18 @@ const users = {
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 //
 app.get("/urls", (req, res) => {
-  var templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  var templateVars = { urls: urlDatabase, users: user };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  var templateVars = {username: req.cookies["username"]};
+  var templateVars = {users: user};
   res.render("urls_new", templateVars);
 });
 
 // new that add another page for displaying a single URL and its shortened form.
 app.get("/urls/:id", (req, res) => {
-  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
+  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], users: user };
   res.render("urls_show", templateVars);
 });
 
@@ -124,6 +124,10 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+app.get("/login", (req, res) => {
+  res.render("login");
+})
+
 // add an endpoint to handle a POST to /login
 // set cookie "username"
 app.post("/login", (req, res) => {
@@ -153,6 +157,11 @@ app.post("/register", (req, res) => {
   if (userEmail.length === 0 || password.length === 0) {
     res.status(400).send('Bad Request');
   } else {
+    const user = {
+      id: userId,
+      email: req.body.email,
+      password: req.body.password
+    }
     res.cookie("user_id", userId);
     // console.log("HEREEEEE!!!", userID);
     res.redirect("/urls");

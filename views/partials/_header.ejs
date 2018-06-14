@@ -1,18 +1,4 @@
+<link rel="text" type="text" href="/registration.ejs">
 
+<link rel="text" type="text" href="/login.ejs">
 
-<meta charset="UTF-8">
-
-<title>Tiny App</title>
-<p>
-  <% if (!username) { %>
-    <form action="/login" method="POST" style="margin:150px">
-      <input id="name" type="text" name="username" placeholder="username" style="width: 300px">
-      <input type="submit" value="login">
-    </form>
-  <% } else { %>
-    <%= username %>
-    <form action="/logout" method="POST" style="margin:150px">
-      <input type="submit" value="Logout">
-    </form>
-  <% } %>
-</p>

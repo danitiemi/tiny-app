@@ -1,0 +1,18 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Tiny App</title>
+<p>
+  <% if (!username) { %>
+    <form action="/login" method="post">
+      <input type="email" name="email" placeholder="email">
+      <input type="password" name="password" placeholder="email">
+      <input type='submit'>
+    </form>
+  <% } else { %>
+    <%= username %>
+    <form action="/logout" method="POST" style="margin:150px">
+      <input type="submit" value="Logout">
+    </form>
+  <% } %>
+</p>
