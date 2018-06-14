@@ -44,8 +44,7 @@ app.get("/", (req, res) => {
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 //
 app.get("/urls", (req, res) => {
-  console.log("gettind urls ", urlDatabase);
-  var templateVars = { urls: urlDatabase, username: req.cookies.username };
+  var templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
   console.log("HEREEEEE!!!",templateVars);
 });
@@ -56,7 +55,7 @@ app.get("/urls/new", (req, res) => {
 
 // new that add another page for displaying a single URL and its shortened form.
 app.get("/urls/:id", (req, res) => {
-  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
+  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 
@@ -111,8 +110,6 @@ app.post("/urls/:id", (req, res) => {
 
 // add an endpoint to handle a POST to /login
 // set cookie "username"
-
-
 app.post("/login", (req, res) => {
   let username = req.body.username;
   res.cookie('username', username);
