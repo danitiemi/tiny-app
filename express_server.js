@@ -37,20 +37,21 @@ var urlDatabase = {
 
 // defining (registering) a HTTP GET request on "/""
 // along with a callback func that will handle the request
-app.get("/", (req, res) => {
-  res.end("Hello!");
-});
+// app.get("/", (req, res) => {
+//   res.end("Hello!");
+// });
 
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 //
 app.get("/urls", (req, res) => {
   var templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
-  console.log("HEREEEEE!!!",templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  var templateVars = {username: req.cookies["username"]};
+
+  res.render("urls_new", templateVars);
 });
 
 // new that add another page for displaying a single URL and its shortened form.
@@ -59,14 +60,13 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
-});
+// app.get("/hello", (req, res) => {
+//   res.end("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 // fix it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -79,7 +79,7 @@ function validateData(data) {
 
 app.post("/urls", (req, res) => {
   var valid = validateData(req.body);
-console.log('ís valid',valid)
+  console.log('is valid',valid);
   if (valid) {
     // const urlDatabase = {
     //   : req.body.longURL
@@ -88,7 +88,8 @@ console.log('ís valid',valid)
     var longURL = req.body.longURL;
     urlDatabase[shortURL] = longURL;
     res.redirect("urls/" + shortURL);
-  } else {
+  }
+  else {
     // error
     res.render("urls_new", {
       error: "Please, enter a valid URL."
@@ -110,19 +111,21 @@ app.post("/urls/:id", (req, res) => {
 
 // add an endpoint to handle a POST to /login
 // set cookie "username"
-app.post("/login", (req, res) => {
+app.post("/urls/:id/login", (req, res) => {
   let username = req.body.username;
   res.cookie("username", username);
   res.redirect("/urls");
 });
 
 // /logout endpoint so that it clears the username cookie and redirects the user back to the /urls page
-app.post("/logout"), (req, res) => {
-  res.clearCookie("username");
+app.post("/logout", (req, res) => {
+  let username = req.body.username;
+  console.log("HEREEEEE!!!", username);
+  res.clearCookie("username", username);
   res.redirect("/urls");
-}
+});
 
-app.get("/u/:shortURL", (req, res) => {
+app.get("/:shortURL", (req, res) => {
   var longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
