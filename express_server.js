@@ -10,6 +10,10 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+// cookieParser
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 // start the server
 const PORT = 8080; // default port 8080
 app.listen(PORT, () => {
@@ -41,8 +45,9 @@ app.get("/", (req, res) => {
 //
 app.get("/urls", (req, res) => {
   console.log("gettind urls ", urlDatabase);
-  var templateVars = { urls: urlDatabase };
+  var templateVars = { urls: urlDatabase, username: req.cookies.username };
   res.render("urls_index", templateVars);
+  console.log("HEREEEEE!!!",templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -105,10 +110,14 @@ app.post("/urls/:id", (req, res) => {
 });
 
 // add an endpoint to handle a POST to /login
-// app.post("/login", (req, res) => {
-//   res.cookie('some_cross_domain_cookie', 'http://mysubdomain.example.com',{domain:'example.com'});
-//   res.redirect("/urls");
-// });
+// set cookie "username"
+
+
+app.post("/login", (req, res) => {
+  let username = req.body.username;
+  res.cookie('username', username);
+  res.redirect("/urls");
+});
 
 app.get("/u/:shortURL", (req, res) => {
   var longURL = urlDatabase[req.params.shortURL];
