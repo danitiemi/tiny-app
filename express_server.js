@@ -31,8 +31,9 @@ function generateRandomString() {
 }
 
 let urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  // "userID": req.cookies["userID"],
+  // "b2xVn2": "http://www.lighthouselabs.ca",
+  // "9sm5xK": "http://www.google.com"
 };
 
 // used to store and access the users in the app.
@@ -58,12 +59,21 @@ app.get("/", (req, res) => {
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 //
 app.get("/urls", (req, res) => {
-  var templateVars = { urls: urlDatabase, users: users };
-  res.render("urls_index", templateVars);
+  let templateVars = {
+    urls: urlDatabase,
+    users: users
+  };
+  res.render("urls_index", templateVars, users);
 });
 
 app.get("/urls/new", (req, res) => {
-  var templateVars = {users: users};
+  let templateVars = {
+    users: users
+  };
+  let userID = req.cookies["userID"];
+  if (!userID) {
+    res.redirect("/login");
+  }
   res.render("urls_new", templateVars);
 });
 
@@ -182,11 +192,11 @@ app.post("/register", (req, res) => {
   let user = {};
 
   if (!userEmail || !password) {
-    res.send('email ou senha vazia');
+    res.status(400).send('Bad Request');
   } else {
     for (user in users) {
       if (userEmail === users[user].email) {
-        res.send('email ja existe');
+        res.send("E-mail already registered");
         return;
       } else {
         user = {
@@ -200,23 +210,10 @@ app.post("/register", (req, res) => {
       }
     }
   }
-
-  // console.log(Object.keys(users).length);
-  // console.log(users);
-
-  // if (userEmail.length === 0 || password.length === 0) {
-  //   res.status(400).send('Bad Request');
-  // } else {
-  //   for (user in users) {
-  //     user[id]: userId,
-  //     user[email]: req.body.email,
-  //     user[password]: req.body.password
-  //   }
-  //   res.cookie("user_id", userId);
-  //   // console.log("HEREEEEE!!!", userID);
-  //   res.redirect("/urls");
-  // }
 });
+  // console.log(Object.keys(users).length);
+  // console.log(users)
+
 
 app.get("/:shortURL", (req, res) => {
   var longURL = urlDatabase[req.params.shortURL];
