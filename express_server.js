@@ -36,14 +36,14 @@ let urlDatabase = {
 };
 
 // used to store and access the users in the app.
-const users = {
+let users = {
   "userRandomID": {
-    id: "dog",
+    id: "",
     email: "dog@example.com",
     password: "purple-monkey-dinosaur"
   },
  "user2RandomID": {
-    id: "cat",
+    id: "",
     email: "cat@example.com",
     password: "dishwasher-funk"
   }
@@ -58,18 +58,18 @@ const users = {
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 //
 app.get("/urls", (req, res) => {
-  var templateVars = { urls: urlDatabase, users: user };
+  var templateVars = { urls: urlDatabase, users: users };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  var templateVars = {users: user};
+  var templateVars = {users: users};
   res.render("urls_new", templateVars);
 });
 
 // new that add another page for displaying a single URL and its shortened form.
 app.get("/urls/:id", (req, res) => {
-  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], users: user };
+  var templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], users: users };
   res.render("urls_show", templateVars);
 });
 
@@ -130,16 +130,27 @@ app.get("/login", (req, res) => {
 
 // add an endpoint to handle a POST to /login
 // set cookie "username"
+// Modify the existing POST /login endpoint so that it uses the new form data and sets the user_id cookie on successful login.
 app.post("/login", (req, res) => {
-  let username = req.body.username;
-  res.cookie("username", username);
-  res.redirect("/urls");
+  // let userId = cookie?;
+  let email = req.body.email;
+  let password = req.body.email;
+  // let userId = users.user[id];
+  console.log(email, password, users);
+  for (user in users) {
+    if (email === users.user[email] && password === users.user[password]) {
+      res.cookie("user_id", userId);
+      res.redirect("/");
+    } else {
+      res.status(403).send('Bad Request');
+    }
+  }
 });
 
 // /logout endpoint so that it clears the username cookie and redirects the user back to the /urls page
 app.post("/logout", (req, res) => {
-  let username = req.body.username;
-  res.clearCookie("username", username);
+  let userId = users.user[id];
+  res.clearCookie("user_id", userId);
   res.redirect("/urls");
 });
 
@@ -154,9 +165,11 @@ app.post("/register", (req, res) => {
   const userId = generateRandomString();
   const userEmail = req.body.email;
   const password = req.body.password;
+  console.log(userEmail, userId, password);
   if (userEmail.length === 0 || password.length === 0) {
     res.status(400).send('Bad Request');
   } else {
+
     const user = {
       id: userId,
       email: req.body.email,
