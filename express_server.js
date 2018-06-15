@@ -40,20 +40,20 @@ let users = {
   "userRandomID": {
     id: "",
     email: "dog@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "111"
   },
  "user2RandomID": {
     id: "",
     email: "cat@example.com",
-    password: "dishwasher-funk"
+    password: "0"
   }
 };
 
 // defining (registering) a HTTP GET request on "/""
 // along with a callback func that will handle the request
-// app.get("/", (req, res) => {
-//   res.end("Hello!");
-// });
+app.get("/", (req, res) => {
+  res.redirect("/urls");
+});
 
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
 //
@@ -75,6 +75,10 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+app.get("/users.json", (req, res) => {
+  res.json(users);
 });
 
 // app.get("/hello", (req, res) => {
@@ -134,24 +138,33 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   // let userId = cookie?;
   let email = req.body.email;
-  let password = req.body.email;
-  // let userId = users.user[id];
-  console.log(email, password, users);
-  for (user in users) {
-    if (email === users.user[email] && password === users.user[password]) {
-      res.cookie("user_id", userId);
-      res.redirect("/");
-    } else {
-      res.status(403).send('Bad Request');
+  let password = req.body.password;
+  let userID = req.cookies["userID"];
+  // console.log(email, password, users);
+
+
+  if (!email || !password) {
+    res.status(403).send('Bad Request');
+  } else {
+    for (user in users) {
+      if (email === users[user].email && password === users[user].password) {
+        // res.cookie("userID", userID);
+        res.redirect("/");
+        return;
+      } else {
+        res.status(403).send('Bad Request');
+      }
     }
   }
 });
 
 // /logout endpoint so that it clears the username cookie and redirects the user back to the /urls page
 app.post("/logout", (req, res) => {
-  let userId = users.user[id];
-  res.clearCookie("user_id", userId);
+  let userID = req.cookies["userID"];
+  console.log(req.cookies);
+  res.clearCookie("userID", userID);
   res.redirect("/urls");
+  // console.log(userID);
 });
 
 // returns a page that includes a form with an email and password field.
@@ -162,23 +175,47 @@ app.get("/register", (req, res) => {
 // getting info from user registration/ Registration Handler
 // If the e-mail or password are empty strings, send back a response with the 400 status code
 app.post("/register", (req, res) => {
-  const userId = generateRandomString();
-  const userEmail = req.body.email;
-  const password = req.body.password;
-  console.log(userEmail, userId, password);
-  if (userEmail.length === 0 || password.length === 0) {
-    res.status(400).send('Bad Request');
-  } else {
 
-    const user = {
-      id: userId,
-      email: req.body.email,
-      password: req.body.password
+  let userID = generateRandomString();
+  let userEmail = req.body.email;
+  let password = req.body.password;
+  let user = {};
+
+  if (!userEmail || !password) {
+    res.send('email ou senha vazia');
+  } else {
+    for (user in users) {
+      if (userEmail === users[user].email) {
+        res.send('email ja existe');
+        return;
+      } else {
+        user = {
+          id: userID,
+          email: userEmail,
+          password: password
+        }
+        users[userID] = user;
+        res.cookie("userID", userID);
+        res.redirect("/urls");
+      }
     }
-    res.cookie("user_id", userId);
-    // console.log("HEREEEEE!!!", userID);
-    res.redirect("/urls");
   }
+
+  // console.log(Object.keys(users).length);
+  // console.log(users);
+
+  // if (userEmail.length === 0 || password.length === 0) {
+  //   res.status(400).send('Bad Request');
+  // } else {
+  //   for (user in users) {
+  //     user[id]: userId,
+  //     user[email]: req.body.email,
+  //     user[password]: req.body.password
+  //   }
+  //   res.cookie("user_id", userId);
+  //   // console.log("HEREEEEE!!!", userID);
+  //   res.redirect("/urls");
+  // }
 });
 
 app.get("/:shortURL", (req, res) => {
