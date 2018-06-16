@@ -1,25 +1,36 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
+
 <html lang="en">
-<head>
-    <% include partials/_header.ejs %>
-</head>
-<body>
-    <!-- Add your EJS code here -->
-  <% for (url in urls) { %>
-    <li>
-      <%= url %>
-      <%= urls[url] %>
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tiny App</title>
+  </head>
+
+  <body>
+
+    <header>
+      <% include partials/_header.ejs %>
+    </header>
+
+    <% for (url in urls) { %>
+      <li>
+        <%= url %>
+        <%= urls[url] %>
 
         <form method="POST" action="/urls/<%= url %>/delete">
-          <input type=submit value=delete>
+          <input type="submit" value=delete>
         </form>
 
         <form method="GET" action="/urls/<%= url %>">
-          <input type=submit value=edit>
+          <input type="submit" value=edit>
         </form>
-    </li>
-  <% }; %>
-</body>
+
+      </li>
+    <% }; %>
+
+  </body>
 </html>
 

@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
+
 <html lang="en">
 <head>
   <% include partials/_header.ejs %>
 </head>
 <body>
-  <!-- Add your EJS code here -->
+
   <form action="/urls/<%= shortURL %>" method="POST" style="margin:150px">
     <% if (locals.error) { %>
       <p class="alert alert-danger">
         <%= error %>
       </p>
     <% } %>
-    <label for="longURL"><h1> ShortURL <%= shortURL %> </h1></label>
+    <label for="longURL"><h1> ShortURL: <%= shortURL %> </h1></label>
     <input id="longURL" type="text" name="longURL" placeholder= " <%= longURL %> " style="width: 300px">
     <button type= "submit" value="Update">Update</button>
   </form>

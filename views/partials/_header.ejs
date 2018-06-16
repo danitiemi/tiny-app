@@ -1,20 +1,17 @@
-<!DOCTYPE html>
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Tiny App</title>
-</head>
-
-<body>
-
-<a href="/register">registration</a><br>
-<a href="/login">Login</a><br>
-<form action="/logout" method="POST">
-<input type="submit" value="Logout">
-</form>
-<a href="/urls/new">new short link</a>
-
-
-</body>
+<title>Tiny App</title>
+<div class="header clearfix">
+  <nav>
+    <ul class="nav nav-pills pull-right">
+      <li role="presentation"><a href="/">Home</a></li>
+    </ul>
+    <h2>Tiny App</h2>
+    <ul>
+      <li><<a href="/register">Registration</a></li>
+      <li><a href="/login">Login</a></li>
+      <li><a href="/urls/new">New Short URL</a>/li>
+    </ul>
+    <form action="/logout" method="POST">
+      <input type="submit" value="Logout">
+    </form>
+  </nav>
+</div>

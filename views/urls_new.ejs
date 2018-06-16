@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
+
 <html lang="en">
-  <head></head>
+  <head>
+    <meta charset="UTF-8">
+  </head>
   <body style="font-size:20px; padding:50px;">
-    <% include partials/_header %>
-    <form action="/urls" method="POST" style="margin:150px;">
+    <header>
+      <% include partials/_header %>
+    </header>
+
+    <form action="/urls" method="POST" style="margin:150px";>
       <% if (locals.error) { %>
         <p class="alert alert-danger">
           <%= error %>
