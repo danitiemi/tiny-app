@@ -1,17 +1,17 @@
-<title>Tiny App</title>
-<div class="header clearfix">
-  <nav>
-    <ul class="nav nav-pills pull-right">
-      <li role="presentation"><a href="/">Home</a></li>
-    </ul>
-    <h2>Tiny App</h2>
-    <ul>
-      <li><<a href="/register">Registration</a></li>
-      <li><a href="/login">Login</a></li>
-      <li><a href="/urls/new">New Short URL</a>/li>
-    </ul>
-    <form action="/logout" method="POST">
-      <input type="submit" value="Logout">
-    </form>
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">Tiny App</a>
+      </div>
+      <ul class="nav navbar-nav">
+        <li><a href="/register">Registration</a></li>
+        <li><a href="/login">Login</a></li>
+        <li><a href="/urls/new">New Short URL</a></li>
+        <li>
+          <form style="padding-top:20%;"   action="/logout" method="POST">
+            <input  type="submit" value="Logout">
+          </form>
+        </li>
+      </ul>
+    </div>
   </nav>
-</div>

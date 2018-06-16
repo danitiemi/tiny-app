@@ -9,8 +9,12 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-var cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 app.use(cookieParser());
+
+const bcrypt = require("bcrypt");
+const password = "purple-monkey-dinosaur"; // you will probably this from req.params
+const hashedPassword = bcrypt.hashSync(password, 10);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -30,12 +34,10 @@ let urlDatabase = {
 // used to store and access the users in the app.
 let users = {
   "userRandomID": {
-    id: "mmm",
     email: "dog@example.com",
     password: "111"
   },
  "user2RandomID": {
-    id: "mmm",
     email: "cat@example.com",
     password: "0"
   }
@@ -61,15 +63,49 @@ function validateData(data) {
 }
 
 // function which returns the subset of the URL database that belongs to the user with ID id
-// function urlsForUser(id) {
-//   let userURL = [];
-//   for (userID in urlDatabase) {
-//     if (userID === urlDatabase[shortURL].userID) {
-//       userURL.push(req.body.url);
-//     }
-//   }
-//   return userURL;
-// }
+function saveUrlsForUser(id, url) {
+  let userURL = [];
+  // for (user in urlDatabase) {
+  //   if (userID === user) {
+  //     userURL.push(req.body.url);
+  //   }
+  // }
+  // return userURL;
+  if (id in urlDatabase) {
+    urlDatabase[id].append(url);
+  } else {
+    urlDatabase[id] = [url];
+  }
+}
+
+function isLoggedIn(req, res, next) {
+  let userID = req.cookies["userID"];
+  let templateVars = {
+    longURL: req.body.longURL,
+    users: users
+  };
+  if (!userID) {
+    res.redirect("/login");
+  } else {
+    next();
+  }
+}
+
+function ownUrl(req, res, next) {
+  let userID = req.cookies["userID"];
+  let id = req.params.id;
+  let longURL = req.body.longURL;
+  urlDatabase[id] = longURL;
+  if (!userID) {
+    res.status(403).send("Sorry! You are not logged in, yet.");
+  } else {
+    if (longURL !== urlDatabase[userID]) {
+      res.status(403).send("Sorry, this URL is not part of you libray.");
+    } else {
+      next();
+    }
+  }
+}
 
 // ------------ GETs -------------------------------------------------------------------------------------- //
 
@@ -81,12 +117,12 @@ app.get("/users.json", (req, res) => {
   res.json(users);
 });
 
-app.get("/", (req, res) => {
+app.get("/", isLoggedIn, (req, res) => {
   res.redirect("/urls");
 });
 
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
-app.get("/urls", (req, res) => {
+app.get("/urls", isLoggedIn, (req, res) => {
   // let userID = req.cookies["userID"];
   let templateVars = {
     users: users,
@@ -97,22 +133,17 @@ app.get("/urls", (req, res) => {
 });
 
 // route to present the form to the user
-app.get("/urls/new", (req, res) => {
-  let userID = req.cookies["userID"];
+app.get("/urls/new", isLoggedIn, (req, res) => {
   let templateVars = {
-    longURL: req.body.longURL,
-    users: users
+    users: users,
+    urls: urlDatabase
   };
-  if (!userID) {
-    res.redirect("/login");
-  } else {
   res.render("urls_new", templateVars);
-  }
 });
 
 // new that add another page for displaying a single URL and its shortened form.
 app.get("/urls/:id", (req, res) => {
-  // let userID = req.cookies["userID"];
+  let userID = req.cookies["userID"];
   let id = req.params.id;
   let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], users: users };
   res.render("urls_show", templateVars);
@@ -129,24 +160,26 @@ app.get("/login", (req, res) => {
   let userID = req.cookies["userID"];
   // let userEmail = req.body.email;
   // let password = req.body.password;
-  let templateVars = {
-    users: users
-  }
+
   //   password: req.body.password,
   //   email: req.body.email};
-   // console.log("00000000000000000000000000000" );
-  res.render("login", templateVars);
+
+  if ( userID ) {
+     return res.redirect("/urls");
+  } // console.log("00000000000000000000000000000" );
+  res.render("login");
 });
 
 // returns a page that includes a form with an email and password field.
 app.get("/register", (req, res) => {
   res.render("registration");
+
 });
 
-app.get("/:shortURL", (req, res) => {
-  var longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
-});
+// app.get("/:shortURL", (req, res) => {
+//   var longURL = urlDatabase[req.params.shortURL];
+//   res.redirect(longURL);
+// });
 
 // ------------ POSTs -------------------------------------------------------------------------------------- //
 
@@ -164,51 +197,22 @@ app.post("/urls", (req, res) => {
   }
 });
 
-//   if (!userID) {
-//     res.render("/register", {
-//       error: "Log in ou register first."
-//     });
-//   } else if (req.body.longURL && req.body.longURL.length > 0) {
-//     var shortURL = generateRandomString();
-//     var longURL = req.body.longURL;
-//     urlDatabase[shortURL] = longURL;
-//     res.redirect("urls/" + shortURL);
-//   } else {
-//     res.render("urls_new", {
-//       error: "Please, enter a valid URL."
-//     });
-//   }
-// });
-
 // route to receive the new url form submission
 app.post("/urls/new", (req, res) => {
   let userID = req.cookies["userID"];
-  let newUrl = {
-    urls: req.body.longURL,
-    userID: userID
-  }
-  urlDatabase[userID] = newUrl;
+  saveUrlsForUser(userID,req.body.longURL );
   res.redirect("/urls");
 });
 
 //  POST route that removes a URL resource
-app.post("/urls/:id/delete", (req, res) => {
-  // let userID = req.cookies["userID"];
+app.post("/urls/:id/delete", ownUrl, (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
 });
 
 // modify the corresponding longURL and redirect the client back to "/urls"
-app.post("/urls/:id", (req, res) => {
-  // let userID = req.cookies["userID"];
-  let id = req.params.id;
-  // if (!userID) {
-  //   res.render("/register", {
-  //     error: "Log in ou register first."
-  //   });
-  // }
-  let longURL = req.body.longURL;
-  urlDatabase[id] = longURL;
+app.post("/urls/:id", ownUrl, (req, res) => {
+  // updates the URL  ----------------------------
   res.redirect("/urls");
 });
 
@@ -218,34 +222,22 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
-  let userID = req.cookies["userID"];
   // console.log(email, password, users);
 
   if (!email || !password) {
-    res.status(403).send('Bad Request');
+    res.status(403).send("You have not registered yet...");
   } else {
     for (user in users) {
       if (email === users[user].email && password === users[user].password) {
-        // res.cookie("userID", userID);
+        res.cookie("userID", user);
         res.redirect("/urls");
-        return;
       } else {
-        res.status(403);
-         // .send('Bad Request')
+        res.status(403).send('Bad Request');
         res.redirect('/login');
       }
     }
   }
 });
-
-//   if (email && email === users[userID].email && password && password === users[userID].password) {
-//     res.redirect('/urls');
-//     return;
-//   } else {
-//     res.status(403).send('Username and/ or password are incorrect');
-//     res.redirect('/login');
-//   }
-// });
 
 // logout endpoint so that it clears the username cookie and redirects the user back to the /urls page
 app.post("/logout", (req, res) => {
@@ -272,7 +264,6 @@ app.post("/register", (req, res) => {
         return;
       } else {
         user = {
-          id: userID,
           email: userEmail,
           password: password
         }
