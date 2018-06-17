@@ -13,23 +13,21 @@
 
     <header>
       <% include partials/_header.ejs %>
-    </header>
-
-    <% for (url in urls) { %>
+   </header>
+    <% urls.forEach (function (url) { %>
       <li>
-        <%= url %>
-        <%= urls[url] %>
+         <%= url["longURL"] %>
+         <%= url["shortURL"] %>
+      <form method="POST" action="/urls/<%= url["shortURL"] %>/delete">
+        <input type="submit" value=delete>
+      </form>
 
-        <form method="POST" action="/urls/<%= url %>/delete">
-          <input type="submit" value=delete>
-        </form>
-
-        <form method="GET" action="/urls/<%= url %>">
-          <input type="submit" value=edit>
-        </form>
+      <form method="GET" action="/urls/<%= url["shortURL"] %>">
+        <input type="submit" value=edit>
+      </form>
 
       </li>
-    <% }; %>
+    <% }); %>
 
   </body>
 </html>
