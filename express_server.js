@@ -137,12 +137,6 @@ app.get("/", isLoggedIn, (req, res) => {
 
 app.get("/urls", (req, res) => {
   let userID = req.session.userID;
-  // let templateVars = {
-  //   users: users,
-  //   urls: urlDatabase[userID],
-  //   userID: userID,
-  //   urls: urlDatabase[userID]
-  // };
   if (!userID) {
     res.redirect("/login");
   } else {
@@ -152,7 +146,6 @@ app.get("/urls", (req, res) => {
     urls: urlDatabase,
     userID: userID
     };
-    console.log("ooooooooooooooooooooo", templateVars);
     res.render("urls_index", templateVars);
   }
 });
