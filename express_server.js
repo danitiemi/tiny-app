@@ -5,7 +5,7 @@ const PORT = 8080; // default port 8080
 // tells the Express app to use EJS as its templating engine(views)
 app.set("view engine", "ejs");
 
-// The body-parser library will allow us to access POST request parameters
+// The body-parser library to access POST request parameters
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -27,16 +27,19 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-// ------------ GLOBAL OBJECTS ------------------------------------------------------------------------------- //
+// ------------ GLOBAL OBJECTS - DATABASES ------------------------------------------------------------------------------- //
 
-// used to store URLs (short and long), userID
-let urlDatabase = {
-
-  // urls: shortURL { longURL: "http://www.lighthouselabs.ca", userID: userID }
-  //userID: [{ longURL: "http://www.lighthouselabs.ca", short: "" }]
-    // "9sm5xK": "http://www.google.com"
-};
-
+// used to store URLs (short and long) and userID
+let urlDatabase = [
+  {userID1: {
+    shortURL: "b2xVn2",
+    longURL: "http://www.lighthouse.ca"
+  }},
+  {userID2: {
+    shortURL: "m3Fbs4",
+    longURL: "http://www.pandacuteness.com"
+  }}
+];
 
 // used to store and access the users in the app.
 let users = {
@@ -72,9 +75,8 @@ function validateData(data) {
 
 // function which returns the subset of the URL database that belongs to the user with ID id
 function saveUrlsForUser(userID, urlObjects) {
-  let userURL = [];
   if (userID in urlDatabase) {
-    urlDatabase[userID].append(urlObjects);
+    urlDatabase[userID].push(urlObjects);
   } else {
     urlDatabase[userID] = [urlObjects];
   }
@@ -86,7 +88,8 @@ function isLoggedIn(req, res, next) {
   let templateVars = {
     longURL: req.body.longURL,
     users: users,
-    userID: userID
+    userID: userID,
+    urls: urlDatabase[userID]
   };
   if (!userID) {
     res.redirect("/login");
@@ -95,7 +98,7 @@ function isLoggedIn(req, res, next) {
   }
 }
 
-// checks if the URL belongs to user
+// checks if the URL belongs to the user
 function isUsersUrl(req, res, next) {
   let userID = req.session.userID;
   let id = req.params.id;
@@ -112,14 +115,10 @@ function isUsersUrl(req, res, next) {
   }
 }
 
-// ------------ GETs -------------------------------------------------------------------------------------- //
+// ------------ GET REQUESTS------------------------------------------------------------------------------ //
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-});
-
-app.get("/users.json", (req, res) => {
-  res.json(users);
 });
 
 app.get("/", isLoggedIn, (req, res) => {
@@ -127,21 +126,43 @@ app.get("/", isLoggedIn, (req, res) => {
 });
 
 // new route handler for "/urls" and use res.render() to pass the URL data to your template.
-app.get("/urls", isLoggedIn, (req, res) => {
+// app.get("/urls", isLoggedIn, (req, res) => {
+//   let userID = req.session.userID;
+//   let templateVars = {
+//     users: users,
+//     urls: urlDatabase[userID]
+//   };
+//   res.render("urls_index", templateVars);
+// });
+
+app.get("/urls", (req, res) => {
   let userID = req.session.userID;
-  let templateVars = {
+  // let templateVars = {
+  //   users: users,
+  //   urls: urlDatabase[userID],
+  //   userID: userID,
+  //   urls: urlDatabase[userID]
+  // };
+  if (!userID) {
+    res.redirect("/login");
+  } else {
+    // let urls = urlDatabase[userID];
+    let templateVars = {
     users: users,
-    urls: urlDatabase[userID]
-  };
-  console.log(templateVars);
-  res.render("urls_index", templateVars);
+    urls: urlDatabase,
+    userID: userID
+    };
+    console.log("ooooooooooooooooooooo", templateVars);
+    res.render("urls_index", templateVars);
+  }
 });
 
 // route to present the form to the user
 app.get("/urls/new", isLoggedIn, (req, res) => {
+  let userID = req.session.userID;
   let templateVars = {
     users: users,
-    urls: urlDatabase
+    urls: urlDatabase[userID]
   };
   res.render("urls_new", templateVars);
 });
@@ -150,35 +171,40 @@ app.get("/urls/new", isLoggedIn, (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let userID = req.session.userID;
   let id = req.params.id;
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id], users: users };
-  res.render("urls_show", templateVars);
+  let templateVars = {
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    users: users,
+    urls: urlDatabase[userID]
+  };
+  res.render("urls_index", templateVars);
 });
 
 // redirect shortUrls to its longURL
-// app.get("/u/:shortURL", (req, res) => {
-//   let longURL = urlDatabase[req.params.shortURL];
-//   res.redirect(longURL);
-// });
-
+app.get("/u/:id", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL.url);
+});
 
 app.get("/login", (req, res) => {
   let userID = req.session.userID;
-  // let userEmail = req.body.email;
-  // let password = req.body.password;
-
-  //   password: req.body.password,
-  //   email: req.body.email};
-
-  if ( userID ) {
-     return res.redirect("/urls");
-  } // console.log("00000000000000000000000000000" );
-  res.render("login");
+  let templateVars = {
+    users: users
+  };
+  // if (userID) {
+  //   res.redirect("/urls");
+  //   return;
+  // }
+  res.render("login", templateVars);
 });
 
 // returns a page that includes a form with an email and password field.
 app.get("/register", (req, res) => {
-  res.render("registration");
-
+  let userID = req.session.userID;
+  let templateVars = {
+    users: users
+  }
+  res.render("register", templateVars);
 });
 
 // app.get("/:shortURL", (req, res) => {
@@ -186,7 +212,7 @@ app.get("/register", (req, res) => {
 //   res.redirect(longURL);
 // });
 
-// ------------ POSTs -------------------------------------------------------------------------------------- //
+// ------------ POST REQUESTS ---------------------------------------------------------------------------- //
 
 app.post("/urls", (req, res) => {
   let userID = req.session.userID;
@@ -198,11 +224,10 @@ app.post("/urls", (req, res) => {
       longURL: req.body.longURL,
       shortURL: generateRandomString()
     });
+    console.log(shortURL, longURL);
     res.redirect("urls/" + shortURL);
   } else {
-    res.render("urls_new", {
-      error: "Please, enter a valid URL."
-    });
+    res.status(403).send("Sorry! You are not logged in, yet.");
   }
 });
 
@@ -218,14 +243,17 @@ app.post("/urls/new", (req, res) => {
 
 //  POST route that removes a URL resource
 app.post("/urls/:id/delete", isUsersUrl, (req, res) => {
+  let userID = req.session.userID;
   delete urlDatabase[req.params.id];
+  console.log(urlDatabase[req.params.id]);
   res.redirect("/urls");
 });
 
-// modify the corresponding longURL and redirect the client back to "/urls"
+// update the corresponding longURL and redirect the client back to "/urls"
 app.post("/urls/:id", isUsersUrl, (req, res) => {
-  // updates the URL  ----------------------------
-
+  if (urlDatabase[req.params.id].userID === req.session.userID) {
+    urlDatabase[req.params.id].url = req.body.longURL;
+  }
   res.redirect("/urls");
 });
 
@@ -233,21 +261,20 @@ app.post("/urls/:id", isUsersUrl, (req, res) => {
 // set cookie "username"
 // Modify the existing POST /login endpoint so that it uses the new form data and sets the userID cookie on successful login.
 app.post("/login", (req, res) => {
+  let userID = req.session.userID;
   let email = req.body.email;
   let password = req.body.password;
 
   for (user in users) {
-    console.log(users, users[user].password);
     if (email !== users[user].email) {
       res.status(403).send("You have not registered yet...");
     } else {
       bcrypt.compareSync(password, users[user].password, 10, function(err, res) {
-        if(true) {
+        if (true) {
           req.session.userID = user;
-          // res.cookie("userID", user);
           res.redirect("/urls");
         } else {
-        res.status(403).send('Bad Request');
+        res.status(403).send('Login information not found.');
         res.redirect('/login');
         }
       });
@@ -259,7 +286,6 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   let userID = req.session.userID;
   req.session = null;
-  // res.clearCookie("userID", userID);
   res.redirect("/urls");
 });
 
@@ -274,7 +300,7 @@ app.post("/register", (req, res) => {
   let user = {};
 
   if (!userEmail || !password) {
-    res.status(400).send('Bad Request');
+    res.status(400).send("Bad Request");
   } else {
     for (userID in users) {
       if (userEmail === users[userID].email) {
@@ -288,13 +314,8 @@ app.post("/register", (req, res) => {
       }
     users[userID] = user;
     req.session.userID = userID;
-    // res.cookie("userID", userID);
     res.redirect("/urls");
   }
 });
-  // console.log(Object.keys(users).length);
-  // console.log(users)
-
-
 
 

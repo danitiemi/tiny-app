@@ -1,22 +1,42 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
-
 <html lang="en">
-<head>
-  <% include partials/_header.ejs %>
-</head>
-<body>
 
-  <form action="/urls/<%= shortURL %>" method="POST" style="margin:150px">
-    <% if (locals.error) { %>
-      <p class="alert alert-danger">
-        <%= error %>
-      </p>
-    <% } %>
-    <label for="longURL"><h1> ShortURL: <%= shortURL %> </h1></label>
-    <input id="longURL" type="text" name="longURL" placeholder= " <%= longURL %> " style="width: 300px">
-    <button type= "submit" value="Update">Update</button>
-  </form>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tiny App</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <% include partials/_header.ejs %>
+  </head>
+
+  <body>
+    <div class="container align-center">
+      <div class="row">
+        <div class="col-xl-12 col-sml-12">
+          <form action="/urls/<%= shortURL %>" method="POST" style="margin:150px">
+            <% if (locals.error) { %>
+              <p class="alert alert-danger">
+                <%= error %>
+              </p>
+              <% } %>
+                <label for="longURL">
+                  <h1> ShortURL
+                    <%= shortURL %>
+                  </h1>
+                </label>
+                <input id="longURL" type="text" name="longURL" placeholder=" <%= longURL %> " style="width: 300px">
+                <div class="container text-center align-middle">
+                  <div class="row align-middle" >
+                    <div class="col-xl-12 col-sml-12">
+                      <button type="submit" value="Update">Update</button>
+                    </div>
+                  </div>
+                </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
 
