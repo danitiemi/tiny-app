@@ -11,6 +11,9 @@ Express web framework
 
 ## Final Product
 
+!["Screenshot of the Register Page"] (https://github.com/danitiemi/tiny-app/blob/master/urls-page.png/Screen%20Shot%202018-06-18%20at%201.41.04%20AM.png?raw=true)
+
+!["Screenshot of the Add a New URL Page"] (https://github.com/danitiemi/tiny-app/blob/master/urls-page.png/Screen%20Shot%202018-06-18%20at%201.41.26%20AM.png?raw=true)
 
 ## Dependencies
 - Node.js
