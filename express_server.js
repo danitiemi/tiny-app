@@ -125,16 +125,6 @@ app.get("/", isLoggedIn, (req, res) => {
   res.redirect("/urls");
 });
 
-// new route handler for "/urls" and use res.render() to pass the URL data to your template.
-// app.get("/urls", isLoggedIn, (req, res) => {
-//   let userID = req.session.userID;
-//   let templateVars = {
-//     users: users,
-//     urls: urlDatabase[userID]
-//   };
-//   res.render("urls_index", templateVars);
-// });
-
 app.get("/urls", (req, res) => {
   let userID = req.session.userID;
   if (!userID) {
@@ -184,10 +174,6 @@ app.get("/login", (req, res) => {
   let templateVars = {
     users: users
   };
-  // if (userID) {
-  //   res.redirect("/urls");
-  //   return;
-  // }
   res.render("login", templateVars);
 });
 
@@ -199,11 +185,6 @@ app.get("/register", (req, res) => {
   }
   res.render("register", templateVars);
 });
-
-// app.get("/:shortURL", (req, res) => {
-//   var longURL = urlDatabase[req.params.shortURL];
-//   res.redirect(longURL);
-// });
 
 // ------------ POST REQUESTS ---------------------------------------------------------------------------- //
 
@@ -217,7 +198,6 @@ app.post("/urls", (req, res) => {
       longURL: req.body.longURL,
       shortURL: generateRandomString()
     });
-    console.log(shortURL, longURL);
     res.redirect("urls/" + shortURL);
   } else {
     res.status(403).send("Sorry! You are not logged in, yet.");
@@ -238,7 +218,6 @@ app.post("/urls/new", (req, res) => {
 app.post("/urls/:id/delete", isUsersUrl, (req, res) => {
   let userID = req.session.userID;
   delete urlDatabase[req.params.id];
-  console.log(urlDatabase[req.params.id]);
   res.redirect("/urls");
 });
 
@@ -310,5 +289,3 @@ app.post("/register", (req, res) => {
     res.redirect("/urls");
   }
 });
-
-
