@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 
 // tells the Express app to use EJS as its templating engine(views)
 app.set("view engine", "ejs");
@@ -30,16 +30,21 @@ app.listen(PORT, () => {
 // ------------ GLOBAL OBJECTS - DATABASES ------------------------------------------------------------------------------- //
 
 // used to store URLs (short and long) and userID
-let urlDatabase = [
-  {userID1: {
+let urlDatabase = {
+
+  "b2xVn2":{
     shortURL: "b2xVn2",
-    longURL: "http://www.lighthouse.ca"
-  }},
-  {userID2: {
-    shortURL: "m3Fbs4",
-    longURL: "http://www.pandacuteness.com"
-  }}
-];
+    longURL: "http://www.lighthouse.ca",
+    userID: "userRandomID",
+  },
+
+  "h39Yu":{
+    shortURL: "h39Yu",
+    longURL: "http://www.google.com",
+    userID: "userRandomID",
+  }
+
+};
 
 // used to store and access the users in the app.
 let users = {
@@ -115,6 +120,21 @@ function isUsersUrl(req, res, next) {
   }
 }
 
+function getUrlsForUser(userId){
+  let urls = {};
+  for(var key in urlDatabase){
+    if(urlDatabase[key].userID===userId){
+      //console.log(matched);
+      urls[key] = {
+        "shortURL": urlDatabase[key].shortURL,
+        "longURL": urlDatabase[key].longURL
+      }
+    }
+  }
+  //console.log(urls);
+  return urls;
+}
+
 // ------------ GET REQUESTS------------------------------------------------------------------------------ //
 
 app.get("/urls.json", (req, res) => {
@@ -131,10 +151,13 @@ app.get("/urls", (req, res) => {
     res.redirect("/login");
   } else {
     // let urls = urlDatabase[userID];
+    let urls = getUrlsForUser(userID);
+    console.log(urls);
     let templateVars = {
-    users: users,
-    urls: urlDatabase,
-    userID: userID
+      //users: users,
+      urls: urls,
+     // urls: urlDatabase[req.params.id]
+      userID: userID
     };
     res.render("urls_index", templateVars);
   }
@@ -154,13 +177,14 @@ app.get("/urls/new", isLoggedIn, (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let userID = req.session.userID;
   let id = req.params.id;
+  let urls = getUrlsForUser(userID);
   let templateVars = {
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
-    users: users,
-    urls: urlDatabase[userID]
+    longURL: urlDatabase[req.params.id].longURL,
+    //user: userID;
+    //urls: urls;
   };
-  res.render("urls_index", templateVars);
+  res.render("urls_show", templateVars);
 });
 
 // redirect shortUrls to its longURL
@@ -194,10 +218,17 @@ app.post("/urls", (req, res) => {
   if (valid) {
     var shortURL = generateRandomString();
     var longURL = req.body.longURL;
-    saveUrlsForUser(userID, {
-      longURL: req.body.longURL,
-      shortURL: generateRandomString()
-    });
+
+    urlDatabase[shortURL] = {
+      shortURL: shortURL,
+      longURL: longURL,
+      userID: userID
+    };
+    // saveUrlsForUser(userID, {
+    //   longURL: req.body.longURL,
+    //   shortURL: generateRandomString()
+    // });
+    console.log(urlDatabase);
     res.redirect("urls/" + shortURL);
   } else {
     res.status(403).send("Sorry! You are not logged in, yet.");
@@ -274,17 +305,19 @@ app.post("/register", (req, res) => {
   if (!userEmail || !password) {
     res.status(400).send("Bad Request");
   } else {
-    for (userID in users) {
-      if (userEmail === users[userID].email) {
+    for (var key in  users) {
+      if (userEmail === users[key].email) {
         res.send("E-mail already registered");
         return;
       }
     }
+    console.log("random generate ", userID);
     user = {
       email: userEmail,
       password: hashedPassword
-      }
+    }
     users[userID] = user;
+    console.log("users database ", users);
     req.session.userID = userID;
     res.redirect("/urls");
   }

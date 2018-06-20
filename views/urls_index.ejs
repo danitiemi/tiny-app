@@ -1,43 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Tiny App</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  </head>
 
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>Tiny App</title>
-      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    </head>
+  <body>
 
-    <body>
-
-    <header>
-      <% include partials/_header.ejs %>
-    </header>
-       <div class="container text-center">
-        <div class="row">
-          <div class="col-xl-12 col-sml-12">
-            <% for (var url in urls) { %>
-              <li>
-                <%= url["shortURL"] %>
-                <%= url["longURL"] %>
-                    <form method="POST" action="/urls/<%= url["shortURL"] %>/delete">
-                      <input  type="submit" value=delete>
-                    </form>
-                    <div class="container align-center">
-                      <div class="row">
-                        <div class="col-xl-12 col-sml-12">
-                          <form method="GET" action="/urls/<%= url["shortURL"] %>">
-                            <input  type="submit" value=edit>
-                          </form>
-                        </div>
+  <header>
+    <% include partials/_header.ejs %>
+  </header>
+     <div class="container text-center">
+      <div class="row">
+        <div class="col-xl-12 col-sml-12">
+          <% for (var url in urls) { %>
+            <li>
+              <%= urls[url].shortURL %>
+              <%= urls[url].longURL %>
+                  <form method="POST" action="/urls/<%= url["shortURL"] %>/delete">
+                    <input  type="submit" value=delete>
+                  </form>
+                  <div class="container align-center">
+                    <div class="row">
+                      <div class="col-xl-12 col-sml-12">
+                        <form method="GET" action="/urls/<%= url["shortURL"] %>">
+                          <input  type="submit" value=edit>
+                        </form>
                       </div>
                     </div>
-              </li>
-              <% } %>
-          </div>
+                  </div>
+            </li>
+            <% } %>
         </div>
       </div>
-    </body>
+    </div>
+
+  </body>
+
 </html>
 
