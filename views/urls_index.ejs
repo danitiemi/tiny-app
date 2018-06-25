@@ -20,13 +20,13 @@
             <li>
               <%= urls[url].shortURL %>
               <%= urls[url].longURL %>
-                  <form method="POST" action="/urls/<%= url["shortURL"] %>/delete">
+                  <form method="POST" action="/urls/<%= urls[url].shortURL %>/delete">
                     <input  type="submit" value=delete>
                   </form>
                   <div class="container align-center">
                     <div class="row">
                       <div class="col-xl-12 col-sml-12">
-                        <form method="GET" action="/urls/<%= url["shortURL"] %>">
+                        <form method="GET" action="/urls/<%= urls[url].shortURL %>">
                           <input  type="submit" value=edit>
                         </form>
                       </div>
