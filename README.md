@@ -19,11 +19,11 @@ Express web framework
 - Node.js
 - Express
 - EJS
-- bcrypt
-- body-parser
-- cookie-session
+- Bcrypt
+- Body-parser
+- Cookie-session
 
 ## Getting Started
 
-- Install all dependencies (using the 'npm install' command)
+- Install all dependencies (using the 'npm install' command for each of it).
 - Run the development web server using the "node express_server.js" command.
