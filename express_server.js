@@ -126,7 +126,10 @@ function isRegistered(usersDB, email, userEmail) {
     for (let key in usersDB) {
       let result = usersDB[key][email];
       if (userEmail.toLowerCase() === result.toLowerCase()) {
-        return usersDB[key];
+        return {
+          key: key,
+          data: usersDB[key]
+        };
       }
     }
   }
@@ -210,7 +213,7 @@ app.get("/u/:id", (req, res) => {
 app.get("/login", (req, res) => {
   let userID = req.session.userID;
   let templateVars = { users: users };
-  res.render("login");
+  res.render("login", templateVars);
 });
 
 // Register form with an email and password field.
@@ -288,10 +291,10 @@ app.post("/login", (req, res) => {
   matchId = isRegistered(users, "email", email);
 
   if (matchId) {
-    let matchPassword = bcrypt.compareSync(password, matchId.password, 10);
+    let matchPassword = bcrypt.compareSync(password, matchId.data.password, 10);
 
     if (matchPassword) {
-      req.session.userID = matchId.id;
+      req.session.userID = matchId.key;
       res.redirect("/urls");
     } else {
       res.status(403).send("Login information not found. Please try again.");
